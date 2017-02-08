@@ -19,6 +19,7 @@ html.full(lang='en')
       script(src='https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js')
   body
 
+   
     // Put your page content here!
     // jQuery
     script(src='js/jquery.js')
