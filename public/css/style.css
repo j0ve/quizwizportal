@@ -54,7 +54,6 @@ body {
 .answerrow {
     height: 5vh;
     width: auto;
-    white-space: nowrap;
 }
 
 .answertext {
