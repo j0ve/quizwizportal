@@ -11,7 +11,7 @@
 
 @media (max-width: @screen-xs) {
     body {
-        font-size: 10px;
+        font-size: 8px;
     }
 }
 
@@ -42,23 +42,24 @@ body {
 .answercontainer {
     margin-left: 12vw;
     text-align: left;
-    font-size: 1.5em;
     color: #d6d6d6;
 }
 
 .answerbtn {
-    float: left;
+    display: inline;
+    margin-right: 5px;
     width: 2vw;
 }
 
 .answerrow {
     height: 5vh;
-    clear: left;
+    width: auto;
+    white-space: nowrap;
 }
 
 .answertext {
-    float: left;
-    margin-left: 1%;
+    font-size: 1.5em;
+    display: inline;
 }
 
 
