@@ -12,11 +12,13 @@ html.full(lang='en')
     link(href='css/bootstrap.min.css', rel='stylesheet')
     // Custom CSS
     link(href='css/style.css', rel='stylesheet')
+    script(src='https://code.jquery.com/jquery-3.1.1.min.js')
     // HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries
     // WARNING: Respond.js doesn't work if you view the page via file://
     //if lt IE 9
       script(src='https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js')
       script(src='https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js')
+
   body
 // gejat van bootstrap showcare, container div
 
@@ -27,16 +29,16 @@ html.full(lang='en')
     h1 #{question}
     .answercontainer
       .answerrow 
-        button.btn.btn-primary.answerbtn(type='button') A
+        button#answer_1.btn.btn-primary.answerbtn(type='button') A
         .answertext #{answer1}
       .answerrow
-        button.btn.btn-success.answerbtn(type='button') B
+        button#answer_2.btn.btn-success.answerbtn(type='button') B
         .answertext #{answer2}
       .answerrow 
-        button.btn.btn-warning.answerbtn(type='button') C
+        button#answer_3.btn.btn-warning.answerbtn(type='button') C
         .answertext #{answer3}
       .answerrow 
-        button.btn.btn-danger.answerbtn(type='button') D
+        button#answer_4.btn.btn-danger.answerbtn(type='button') D
         .answertext #{answer4}
 
 
@@ -55,3 +57,6 @@ script.
   })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
   ga('create', 'UA-91613782-1', 'auto');
   ga('send', 'pageview');
+        $(".answerbtn").click(function () {
+            
+        });
