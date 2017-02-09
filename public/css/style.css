@@ -4,16 +4,59 @@
  * Licensed under MIT (https://github.com/BlackrockDigital/startbootstrap/blob/gh-pages/LICENSE)
  */
 
+@font-face {
+    font-family: bauhaus;
+    src: url(/fonts/bauhaus93.ttf);
+}
+
 body {
+    font-family: bauhaus;
     margin-top: 50px;
     /* Required margin for .navbar-fixed-top. Remove if using .navbar-static-top. Change if height of navigation changes. */
+    background-color: transparent;
+}
+
+.theme-showcase {
+    margin-top: 12%;
+}
+
+.jumbotron {
+    text-align: center;
+    background-color: transparent;
+}
+
+.jumbotron h1 {
+    font-size: 20pt;
+    color: #f47cff;
+}
+
+.answercontainer {
+    margin-left: 30%;
+    text-align: left;
+    font-size: 17pt;
+    color: #d6d6d6;
+}
+
+.answerbtn {
+    float: left;
+    width: 30pt;
+}
+
+.answerrow {
+    height: 40pt;
+    clear: left;
+}
+
+.answertext {
+    float: left;
+    margin-left: 1%;
 }
 
 
 /* Header Image Background - Change the URL below to your image path (example: ../images/background.jpg) */
 
 .full {
-    background: url('../img/bg1.jpg') no-repeat center top fixed;
+    background: url('../img/bg2.jpg') no-repeat center top fixed;
     -webkit-background-size: cover;
     -moz-background-size: cover;
     background-size: cover;

@@ -18,6 +18,29 @@ html.full(lang='en')
       script(src='https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js')
       script(src='https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js')
   body
+// gejat van bootstrap showcare, container div
+
+
+.container.theme-showcase(role='main')
+  // Main jumbotron
+  .jumbotron
+    h1 #{question}
+    .answercontainer
+      .answerrow 
+        button.btn.btn-primary.answerbtn(type='button') A
+        .answertext #{answer1}
+      .answerrow
+        button.btn.btn-success.answerbtn(type='button') B
+        .answertext #{answer2}
+      .answerrow 
+        button.btn.btn-warning.answerbtn(type='button') C
+        .answertext #{answer3}
+      .answerrow 
+        button.btn.btn-danger.answerbtn(type='button') D
+        .answertext #{answer4}
+
+
+
 
     // Put your page content here!
     // jQuery
