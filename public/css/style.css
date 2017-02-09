@@ -16,34 +16,31 @@ body {
     background-color: transparent;
 }
 
-.theme-showcase {
-    margin-top: 12%;
-}
-
 .jumbotron {
+    margin-top: 20vh;
     text-align: center;
     background-color: transparent;
 }
 
 .jumbotron h1 {
-    font-size: 20pt;
+    font-size: 2.4em;
     color: #f47cff;
 }
 
 .answercontainer {
-    margin-left: 30%;
+    margin-left: 12vw;
     text-align: left;
-    font-size: 17pt;
+    font-size: 1.5em;
     color: #d6d6d6;
 }
 
 .answerbtn {
     float: left;
-    width: 30pt;
+    width: 2vw;
 }
 
 .answerrow {
-    height: 40pt;
+    height: 5vh;
     clear: left;
 }
 
