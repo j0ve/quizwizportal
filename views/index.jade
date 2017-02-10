@@ -7,7 +7,7 @@ html.full(lang='en')
     meta(name='viewport', content='width=device-width, initial-scale=1')
     meta(name='description', content='')
     meta(name='author', content='')
-    title QuizWiz - Binnenkort...
+    title QuizWiz
     // Bootstrap Core CSS
     link(href='css/bootstrap.min.css', rel='stylesheet')
     // Custom CSS
@@ -23,22 +23,26 @@ html.full(lang='en')
 // gejat van bootstrap showcare, container div
 
 
+
+
 .container.theme-showcase(role='main')
+  .titlecontainer
+    | QuizWiz
   // Main jumbotron
   .jumbotron
     h1 #{question}
     .answercontainer
       .answerrow 
-        button#answer_1.btn.btn-primary.answerbtn(type='button') A
+        button#answer_0.btn.btn-primary.answerbtn(type='button') A
         .answertext #{answer1}
       .answerrow
-        button#answer_2.btn.btn-success.answerbtn(type='button') B
+        button#answer_1.btn.btn-success.answerbtn(type='button') B
         .answertext #{answer2}
       .answerrow 
-        button#answer_3.btn.btn-warning.answerbtn(type='button') C
+        button#answer_2.btn.btn-warning.answerbtn(type='button') C
         .answertext #{answer3}
       .answerrow 
-        button#answer_4.btn.btn-danger.answerbtn(type='button') D
+        button#answer_3.btn.btn-danger.answerbtn(type='button') D
         .answertext #{answer4}
 
 
@@ -57,6 +61,9 @@ script.
   })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
   ga('create', 'UA-91613782-1', 'auto');
   ga('send', 'pageview');
-        $(".answerbtn").click(function () {
-            
+        $(".answerbtn").click(function (event) {
+            var id = event.target.id.replace('answer_', '');
+           $.post('/hpbuttonclick/' + id, function(data) {
+             console.log(data);
+           });
         });

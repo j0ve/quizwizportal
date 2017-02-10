@@ -28,8 +28,16 @@ body {
     background-color: transparent;
 }
 
+.titlecontainer {
+    text-align: center;
+    padding-left: 60px;
+    padding-right: 60px;
+    padding-top: 48px;
+    font-size: 5em;
+    color: #fff;
+}
+
 .jumbotron {
-    margin-top: 20vh;
     text-align: center;
     background-color: transparent;
 }
@@ -65,7 +73,7 @@ body {
 /* Header Image Background - Change the URL below to your image path (example: ../images/background.jpg) */
 
 .full {
-    background: url('../img/bg2.jpg') no-repeat center top fixed;
+    background: url('../img/bg3.jpg') no-repeat center top fixed;
     -webkit-background-size: cover;
     -moz-background-size: cover;
     background-size: cover;
