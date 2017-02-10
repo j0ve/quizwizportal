@@ -48,8 +48,8 @@ body {
 }
 
 .answercontainer {
-    padding-left: 200px;
-    width: 1000px;
+    background-color: rgba(255,255,255,0.1);
+    margin: 0 auto;
     text-align: left;
     color: #d6d6d6;
 }
