@@ -34,6 +34,29 @@ function getConnection() {
     // retourneer de promise 
     return deferred.promise;
 }
+
+function doQuery(queryTemplate, parameters) {
+    var deferred = q.defer();
+
+    connectionManager.getConnection()
+        .then(function(connection) {
+            var query = connectionManager.prepareQuery(queryTemplate, parameters);
+            console.log('Query to execute:' + query);
+            connection.query(query, function(error, result) {
+                if (error) {
+                    console.error(error);
+                    deferred.reject(error);
+                }
+                deferred.resolve(result);
+            });
+        })
+        .fail(function(err) {
+            console.error(JSON.stringify(err));
+            deferred.reject(err);
+        });
+
+    return deferred.promise;
+}
 // functie om connectie te maken en query uit te voeren
 function getRandomHPQuestion() {
     // maak promise aan om te retourneren
