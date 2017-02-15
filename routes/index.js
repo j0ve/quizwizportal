@@ -47,7 +47,7 @@ function doQuery(queryTemplate, parameters) {
 }
 
 
-// functie om connectie te maken en query uit te voeren
+// DEPRECATED functie om connectie te maken en query uit te voeren
 function getRandomHPQuestion() {
     // maak promise aan om te retourneren
     var deferred = q.defer();
@@ -70,6 +70,23 @@ function getRandomHPQuestion() {
     return deferred.promise;
 }
 
+// nieuw: alles opvragen in 1 query, en bovendien alleen een vraag ophalen waarvoor deze cookie id nog geen antwoord heeft gegeven
+function getHPQuestion(cookieId) {
+    var deferred = q.defer();
+    doQuery('SELECT t1.id, t1.question, t2.id AS answer_id, t2.question_id, t2.answer, t2.correct FROM (SELECT id, question FROM TEMP_homepage_questions thq WHERE thq.id NOT IN (SELECT question_id FROM TEMP_homepage_answers tha LEFT JOIN TEMP_homepage_useranswers thu ON thu.answer_id = tha.id AND thu.cookie_id=? WHERE thu.answer_id IS NOT NULL) ORDER BY RAND() LIMIT 1) AS t1 LEFT JOIN TEMP_homepage_answers t2 ON t2.question_id = t1.id ORDER BY answer_id', [cookieId]).then(function(questiondata) {
+        var question = {};
+        question.id = questiondata[0].id;
+        question.text = questiondata[0].question;
+        question.answers = [];
+        for (var i = 0; i < questiondata.length; i++) {
+            question.answers.push({ "id": questiondata[i].answer_id, "answer": questiondata[i].answer, "correct": questiondata[i].correct });
+        }
+        deferred.resolve(question);
+    });
+    return deferred.promise;
+}
+
+
 // zelf gemaakte middleware om te checken of het quizwiz koekje bestaat, en zo niet, maken die handel
 router.use('/', function(req, res, next) {
     // check if client sent cookie
@@ -85,18 +102,22 @@ router.use('/', function(req, res, next) {
 });
 /* GET home page. */
 router.get('/', function(req, res, next) {
-    getRandomHPQuestion().then(function(question) {
-        res.render('index', { question: question.question, answer1: question.answers[0].answer, answer2: question.answers[1].answer, answer3: question.answers[2].answer, answer4: question.answers[3].answer });
+    getHPQuestion(req.cookies.quizwizcookieid).then(function(question) {
+        res.render('index', { question: question.text, answer1: question.answers[0].answer, answer2: question.answers[1].answer, answer3: question.answers[2].answer, answer4: question.answers[3].answer });
     });
 
 });
 
 router.post('/hpbuttonclick/:id', function(req, res, next) {
-    connection.query('INSERT INTO TEMP_homepage_useranswers SET cookie_id="' + req.cookies.quizwizcookieid + '", answer_id = ' + question.answers[parseInt(req.params.id)].id, function(error, results, fields) {
-        if (parseInt(question.answers[parseInt(req.params.id)].correct) === 1) {
+    processHPAnswer(req.cookies.quizwizcookieid, parseInt(req.params.id)).then(function(correct) {
+        connection.query('INSERT INTO TEMP_homepage_useranswers SET cookie_id="' + req.cookies.quizwizcookieid + '", answer_id = ' + question.answers[parseInt(req.params.id)].id, function(error, results, fields) {
+            if (parseInt(question.answers[parseInt(req.params.id)].correct) === 1) {
 
-        }
-        res.json({ correct: parseInt(question.answers[parseInt(req.params.id)].correct) });
+            }
+            res.json({ correct: parseInt(question.answers[parseInt(req.params.id)].correct) });
+        });
+
     });
+
 });
 module.exports = router;
