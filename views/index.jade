@@ -29,21 +29,41 @@ html.full(lang='en')
   .titlecontainer
     | QuizWiz
   // Main jumbotron
-  .jumbotron
-    h1 #{question}
+  .jumbotron#noquestions
+    h1 Hallo quizfanaat!
+    h2 Je hebt alle vragen in de database beantwoord. Kom later terug, dan proberen wij intussen nieuwe vragen te bedenken.
+  .jumbotron#question
+    h1#questiontext
     .answercontainer
       .answerrow 
-        button#answer_0.btn.btn-primary.answerbtn(type='button') A
-        .answertext #{answer1}
+        button#answerbtn0.btn.btn-primary.answerbtn(type='button') A
+        .answertext#answertext0 
       .answerrow
-        button#answer_1.btn.btn-success.answerbtn(type='button') B
-        .answertext #{answer2}
+        button#answerbtn1.btn.btn-success.answerbtn(type='button') B
+        .answertext#answertext1 
       .answerrow 
-        button#answer_2.btn.btn-warning.answerbtn(type='button') C
-        .answertext #{answer3}
+        button#answerbtn2.btn.btn-warning.answerbtn(type='button') C
+        .answertext#answertext2
       .answerrow 
-        button#answer_3.btn.btn-danger.answerbtn(type='button') D
-        .answertext #{answer4}
+        button#answerbtn3.btn.btn-danger.answerbtn(type='button') D
+        .answertext#answertext3
+  .jumbotron#answer
+    h1#answertitle
+    .scorecontainer
+      .scorerow#yourscorerow
+        .scoretext#yourscoretext Jouw score:
+        .scorefield#yourscore
+      .scorerow#scorerow0
+        .scoretext#scorertext0 Score van iemand anders:
+        .scorefield#score0
+      .scorerow#scorerow1
+        .scoretext#scorertext1 Score van nog iemand anders:
+        .scorefield#score1        
+      .scorerow#scorerow2
+        .scoretext#scorertext2 Score van weer iemand anders:
+        .scorefield#score2
+      button#nextquestion.btn.btn-primary(type='button') volgende vraag
+
 
 
 
@@ -61,9 +81,79 @@ script.
   })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
   ga('create', 'UA-91613782-1', 'auto');
   ga('send', 'pageview');
-        $(".answerbtn").click(function (event) {
-            var id = event.target.id.replace('answer_', '');
-           $.post('/hpbuttonclick/' + id, function(data) {
-             console.log(data);
-           });
+  var qid = 0;
+  var answerids = [];
+  // functie om vraag op het scherm te toveren
+  function showQuestion() {
+    // vraagdata ophalen
+    $.post('/hpgetquestion', function(data) {
+        // hebben we geen vraag gevonden? dan boodschap tonen dat er geen nieuwe vragen zijn
+        if(jQuery.isEmptyObject(data)) {
+          $("#question").css("display", "none");
+          $("#answer").css("display", "none");
+          $("#noquestions").css("display", "block");          
+        }
+        // hebben we wel een vraag dan...
+        else {
+          // sla even de question id op, maar is eigenlijk overbodig, want je kunt die achterhalen op basis van answer_id
+          qid = data.id;
+          // zet de vraagtext
+          $("#questiontext").html(data.text);
+          // doorloop alle antwoorden die mee zijn gegeven
+          for(var i = 0; i < data.answers.length; i++) {
+            // toon de text van antwoord 1 en zet de text van het antwoord
+            $("#answertext" + i).css("display", "inline").html(data.answers[i].text);
+            // toon de antwoord 1 knop
+            $("#answerbtn" + i).css("display", "inline");
+            // sla het db id van het antwoord op in een array
+            answerids[i] = data.answers[i].id;
+          }
+          // alle andere vraagtexten en knoppen moeten verborgen worden
+          for(var j = data.answers.length; j < 4; j++) {
+            $("#answertext" + j).css("display", "none");
+            $("#answerbtn" + j).css("display", "none");
+          }
+          // toon het antwoord blok en verberg de rest
+          $("#question").css("display", "block");
+          $("#answer").css("display", "none");
+          $("#noquestions").css("display", "none");
+        }
+    });
+  }
+  // onload functie
+  $(function() {
+    // als op nextquestion wordt gedrukt, toon volgende vraag
+    $("#nextquestion").click(showQuestion);
+    // onload we want to get questionstuff
+    showQuestion();
+    // zet de onclick voor alle antwoordknoppen
+    $(".answerbtn").click(function (event) {
+        // pak id property van knop element
+        var id = event.target.id.replace('answerbtn', '');
+        // stuur bijbehorende db id naar de server, en definieer de volgende callback
+        $.post('/hpanswerclick/' + answerids[id], function(data) {
+          // zet de goed/fout text
+          if(data.correct == "1") $("#answertitle").html("goed geantwoord!");
+          else $("#answertitle").html("fout geantwoord");
+          // zet eigen score
+          $("#yourscore").html(data.score);
+          // toon eigen score
+          $("#yourscorerow").css("display", "block");
+          // toon twee andere opgehaalde scores
+          for(var i=0; i < data.otherscores.length; i++) {
+            $("#scorerow" + i).css("display","block");
+            $("#score" + i).html(data.otherscores[i].score);          
+          }
+          // verberg de rijen als er < 3 scores in de db zijn gevonden
+          for(var j=data.otherscores.length; j < 3; j++) {
+            $("scorerow" + i).css("display","none");
+          }
+          // verberg de vraag div
+          $("#question").css("display", "none");
+          // toon de resultaatdiv
+          $("#answer").css("display", "block");
+          $("#noquestions").css("display", "none");
         });
+    });
+  });
+  

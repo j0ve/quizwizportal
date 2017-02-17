@@ -42,20 +42,60 @@ body {
     background-color: transparent;
 }
 
+.jumbotron#question {
+    display: none;
+}
+
+.jumbotron#answer {
+    display: none;
+}
+
 .jumbotron h1 {
     font-size: 2.4em;
     color: #f47cff;
 }
 
+.jumbotron h2 {
+    font-size: 1.8em;
+    color: #eee;
+}
+
 .answercontainer {
-    background-color: rgba(255,255,255,0.1);
+    background-color: rgba(255, 255, 255, 0.1);
     margin: 0 auto;
     text-align: left;
     color: #d6d6d6;
 }
 
-.answerbtn {
+.scorecontainer {
+    background-color: rgba(255, 255, 255, 0.1);
+    margin: 0 auto;
+    text-align: left;
+    color: #d6d6d6;
+    width: 50%;
+}
+
+.scorerow {
+    display: none;
+    height: auto;
+    width: auto;
+}
+
+.scoretext {
+    font-size: 1.5em;
+    margin-right: 5px;
+    width: 10vw;
     display: inline;
+}
+
+.scorefield {
+    font-size: 1.5em;
+    width: 5vw;
+    display: inline;
+}
+
+.answerbtn {
+    display: none;
     margin-right: 5px;
     width: 2vw;
 }
@@ -67,7 +107,7 @@ body {
 
 .answertext {
     font-size: 1.5em;
-    display: inline;
+    display: none;
 }
 
 

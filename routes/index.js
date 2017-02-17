@@ -47,45 +47,37 @@ function doQuery(queryTemplate, parameters) {
 }
 
 
-// DEPRECATED functie om connectie te maken en query uit te voeren
-function getRandomHPQuestion() {
-    // maak promise aan om te retourneren
-    var deferred = q.defer();
-    // haal een getconnectionpromise op, en als die resolved call de then () functie
-    doQuery('SELECT * FROM TEMP_homepage_questions thq ORDER BY RAND() LIMIT 1', []).then(function(questiondata) {
-        // als de vorige promise geresolved is, kunnen we aan de slag met het query result
-        var question = questiondata[0];
-        question.answers = [];
-        doQuery('SELECT * FROM TEMP_homepage_answers WHERE question_id=? ORDER BY id', [question.id]).then(function(answerdata) {
-            for (var i = 0; i < answerdata.length; i++) {
-                // maak een array met antwoorden
-                question.answers.push({ "id": answerdata[i].id, "answer": answerdata[i].answer, "correct": answerdata[i].correct });
-            }
-            deferred.resolve(question);
-        });
-        // resolve de promise met nu het hele question object
-
-    });
-    // retourneer de hele promise, die dus geresolved wordt in de subquery hierboven
-    return deferred.promise;
-}
-
 // nieuw: alles opvragen in 1 query, en bovendien alleen een vraag ophalen waarvoor deze cookie id nog geen antwoord heeft gegeven
 function getHPQuestion(cookieId) {
     var deferred = q.defer();
     doQuery('SELECT t1.id, t1.question, t2.id AS answer_id, t2.question_id, t2.answer, t2.correct FROM (SELECT id, question FROM TEMP_homepage_questions thq WHERE thq.id NOT IN (SELECT question_id FROM TEMP_homepage_answers tha LEFT JOIN TEMP_homepage_useranswers thu ON thu.answer_id = tha.id AND thu.cookie_id=? WHERE thu.answer_id IS NOT NULL) ORDER BY RAND() LIMIT 1) AS t1 LEFT JOIN TEMP_homepage_answers t2 ON t2.question_id = t1.id ORDER BY answer_id', [cookieId]).then(function(questiondata) {
         var question = {};
-        question.id = questiondata[0].id;
-        question.text = questiondata[0].question;
-        question.answers = [];
-        for (var i = 0; i < questiondata.length; i++) {
-            question.answers.push({ "id": questiondata[i].answer_id, "answer": questiondata[i].answer, "correct": questiondata[i].correct });
+        if (questiondata.length !== 0) {
+            question.id = questiondata[0].id;
+            question.text = questiondata[0].question;
+            question.answers = [];
+            for (var i = 0; i < questiondata.length; i++) {
+                question.answers.push({ "id": questiondata[i].answer_id, "text": questiondata[i].answer, "correct": questiondata[i].correct });
+            }
         }
+        console.log(question);
         deferred.resolve(question);
     });
     return deferred.promise;
 }
 
+function processHPAnswer(cookieId, answerId) {
+    var deferred = q.defer();
+    // deze twee queries kan ik best parallel doen. zit geen volgorde in. dus laat ik q.all eens proberen
+    // maar wel daarna nog even de score ophalen!
+    q.all([doQuery('SELECT correct FROM TEMP_homepage_answers WHERE id=?', answerId), doQuery('INSERT INTO TEMP_homepage_useranswers SET cookie_id=?, answer_id=?', [cookieId, answerId])]).done(function(data) {
+        // als het opslaan van het antwoord en het ophalen van de juistheid ervan gebeurd is: eigen score ophalen en score van 2 willekeurige anderen ophalen
+        q.all([doQuery('SELECT SUM(tha.correct) AS score FROM TEMP_homepage_useranswers thu LEFT JOIN TEMP_homepage_answers tha ON tha.id = thu.answer_id WHERE thu.cookie_id=?', cookieId), doQuery('SELECT SUM(tha.correct) AS score, thu.cookie_id FROM TEMP_homepage_useranswers thu LEFT JOIN TEMP_homepage_answers tha ON tha.id = thu.answer_id WHERE thu.cookie_id IN (SELECT cookie_id FROM TEMP_homepage_useranswers thu2 WHERE cookie_id != ?) GROUP BY thu.cookie_id ORDER BY score DESC LIMIT 3', cookieId)]).done(function(data2) {
+            deferred.resolve({ "correct": data[0][0].correct, "score": data2[0][0].score, "otherscores": data2[1] });
+        });
+    });
+    return deferred.promise;
+}
 
 // zelf gemaakte middleware om te checken of het quizwiz koekje bestaat, en zo niet, maken die handel
 router.use('/', function(req, res, next) {
@@ -93,7 +85,7 @@ router.use('/', function(req, res, next) {
     if (!("quizwizcookieid" in req.cookies)) {
         // no: set a new cookie
         var uniqid = shortid.generate();
-        res.cookie('quizwizcookieid', uniqid, { maxAge: 900000, httpOnly: true });
+        res.cookie('quizwizcookieid', uniqid, { maxAge: 2147483647, httpOnly: true });
         req.cookies.quizwizcookieid = uniqid;
     } else {
         // yes, cookie was already present 
@@ -102,21 +94,19 @@ router.use('/', function(req, res, next) {
 });
 /* GET home page. */
 router.get('/', function(req, res, next) {
-    getHPQuestion(req.cookies.quizwizcookieid).then(function(question) {
-        res.render('index', { question: question.text, answer1: question.answers[0].answer, answer2: question.answers[1].answer, answer3: question.answers[2].answer, answer4: question.answers[3].answer });
-    });
+    res.render('index');
+});
+router.post('/hpgetquestion', function(req, res, next) {
 
+    getHPQuestion(req.cookies.quizwizcookieid).done(function(question) {
+        res.json(question);
+    });
 });
 
-router.post('/hpbuttonclick/:id', function(req, res, next) {
-    processHPAnswer(req.cookies.quizwizcookieid, parseInt(req.params.id)).then(function(correct) {
-        connection.query('INSERT INTO TEMP_homepage_useranswers SET cookie_id="' + req.cookies.quizwizcookieid + '", answer_id = ' + question.answers[parseInt(req.params.id)].id, function(error, results, fields) {
-            if (parseInt(question.answers[parseInt(req.params.id)].correct) === 1) {
 
-            }
-            res.json({ correct: parseInt(question.answers[parseInt(req.params.id)].correct) });
-        });
-
+router.post('/hpanswerclick/:answerId/', function(req, res, next) {
+    processHPAnswer(req.cookies.quizwizcookieid, parseInt(req.params.answerId)).then(function(data) {
+        res.json(data);
     });
 
 });
