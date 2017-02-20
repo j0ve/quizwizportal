@@ -83,16 +83,24 @@ script.
     }
     function savequestion() {
         var question = {}
-        var correctanswers = 0;
+        var correctanswercount = 0;
+        var answercount = 0;
         question.answers = [];
         question.text = $("#questiontext").val();
         for(var i = 0; i < 4; i++) {
             if($("#answertext" + i).val() != "") {
                 question.answers.push({"text": $("#answertext" + i).val(), "correct": ($("#correct"+i).is(":checked")?"1":"0")});
-                correctanswers++;
+                if($("#correct"+i).is(":checked")) correctanswercount++;
+                answercount++;
             }
         }
-        if(question.text !== "" && correctanswers > 0) {
+        if(question.text === "") {
+            alert("je moet wel even tekst invullen voor de vraag");
+        } else if(answercount < 2) {
+            alert("er moeten wel minstens 2 antwoordteksten zijn ingevuld");
+        } else if(correctanswercount === 0) {
+            alert("tenminste 1 van de antwoorden moet aangevinkt zijn als het juiste");
+        } else {
             $.ajax({
                 url: "/admin/hpadminsavequestion",
                 type: "POST",
@@ -101,8 +109,7 @@ script.
                 complete: function(data) {
                     resetform();
                 }
-            });
-            
+            }); 
         }
     }
     $(function() {
