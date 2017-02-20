@@ -11,13 +11,13 @@
 
 @media (max-width: @screen-xs) {
     body {
-        font-size: 5px;
+        font-size: 8px;
     }
 }
 
 @media (max-width: @screen-sm) {
     body {
-        font-size: 14px;
+        font-size: 11px;
     }
 }
 
