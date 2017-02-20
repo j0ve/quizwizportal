@@ -1,0 +1,112 @@
+doctype html
+html.full(lang='en')
+  // Make sure the <html> tag is set to the .full CSS class. Change the background image in the full.css file.
+  head
+    meta(charset='utf-8')
+    meta(http-equiv='X-UA-Compatible', content='IE=edge')
+    meta(name='viewport', content='width=device-width, initial-scale=1')
+    meta(name='description', content='')
+    meta(name='author', content='')
+    title QuizWiz
+    // Bootstrap Core CSS
+    link(href='css/bootstrap.min.css', rel='stylesheet')
+    // Custom CSS
+    link(href='css/style.css', rel='stylesheet')
+    script(src='https://code.jquery.com/jquery-3.1.1.min.js')
+    // HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries
+    // WARNING: Respond.js doesn't work if you view the page via file://
+    //if lt IE 9
+      script(src='https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js')
+      script(src='https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js')
+
+  body
+// gejat van bootstrap showcare, container div
+
+
+
+
+.container.theme-showcase(role='main')
+
+  .jumbotron#admin 
+    table#admintable
+        tr
+            td(colspan='3') vraagtekst:
+                input.admininput#questiontext(type='text', size='80')
+        tr
+            td nr
+            td antwoordtekst
+            td goed
+        tr
+            td 1
+            td(align='left')
+                input.admininput#answertext0(type='text', size="60")
+            td(align='left')
+                input.admininput#correct0(type='checkbox')
+        tr
+            td 2
+            td(align='left')
+                input.admininput#answertext1(type='text', size="60")
+            td(align='left')
+                input.admininput#correct1(type='checkbox')
+        tr
+            td 3
+            td(align='left')
+                input.admininput#answertext2(type='text', size="60")
+            td(align='left')
+                input.admininput#correct2(type='checkbox')
+        tr
+            td 4
+            td(align='left')
+                input.admininput#answertext3(type='text', size="60")
+            td(align='left')
+                input.admininput#correct3(type='checkbox')
+        tr
+            td(colspan='3', align="right") 
+                button.btn.btn-primary#savebtn(type='button') opslaan
+
+    // Put your page content here!
+    // jQuery
+    script(src='https://code.jquery.com/jquery-3.1.1.min.js', integrity='sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8=', crossorigin='anonymous')
+    // Bootstrap Core JavaScript
+    script(src='js/bootstrap.min.js')
+script.
+    function resetform() {
+            $("#questiontext").val(""); 
+            $("#answertext0").val("");
+            $("#correct0" ).prop( "checked", false );
+            $("#answertext1").val(""); 
+            $("#correct1" ).prop( "checked", false );
+            $("#answertext2").val(""); 
+            $("#correct2" ).prop( "checked", false );
+            $("#answertext3").val(""); 
+            $("#correct3" ).prop( "checked", false );
+    }
+    function savequestion() {
+        var question = {}
+        var correctanswers = 0;
+        question.answers = [];
+        question.text = $("#questiontext").val();
+        for(var i = 0; i < 4; i++) {
+            if($("#answertext" + i).val() != "") {
+                question.answers.push({"text": $("#answertext" + i).val(), "correct": ($("#correct"+i).is(":checked")?"1":"0")});
+                correctanswers++;
+            }
+        }
+        if(question.text !== "" && correctanswers > 0) {
+            $.ajax({
+                url: "/admin/hpadminsavequestion",
+                type: "POST",
+                data: JSON.stringify(question),
+                contentType: "application/json",
+                complete: function(data) {
+                    resetform();
+                }
+            });
+            
+        }
+    }
+    $(function() {
+        // als op nextquestion wordt gedrukt, toon volgende vraag
+        $("#savebtn").click(savequestion);
+
+    });

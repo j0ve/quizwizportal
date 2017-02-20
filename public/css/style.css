@@ -11,7 +11,7 @@
 
 @media (max-width: @screen-xs) {
     body {
-        font-size: 8px;
+        font-size: 5px;
     }
 }
 
@@ -108,6 +108,16 @@ body {
 .answertext {
     font-size: 1.5em;
     display: none;
+}
+
+#admin {
+    width: 100%;
+    font-size: 1.5em;
+    color: #fff;
+}
+
+.admininput {
+    color: #000;
 }
 
 

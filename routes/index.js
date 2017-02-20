@@ -50,7 +50,7 @@ function doQuery(queryTemplate, parameters) {
 // nieuw: alles opvragen in 1 query, en bovendien alleen een vraag ophalen waarvoor deze cookie id nog geen antwoord heeft gegeven
 function getHPQuestion(cookieId) {
     var deferred = q.defer();
-    doQuery('SELECT t1.id, t1.question, t2.id AS answer_id, t2.question_id, t2.answer, t2.correct FROM (SELECT id, question FROM TEMP_homepage_questions thq WHERE thq.id NOT IN (SELECT question_id FROM TEMP_homepage_answers tha LEFT JOIN TEMP_homepage_useranswers thu ON thu.answer_id = tha.id AND thu.cookie_id=? WHERE thu.answer_id IS NOT NULL) ORDER BY RAND() LIMIT 1) AS t1 LEFT JOIN TEMP_homepage_answers t2 ON t2.question_id = t1.id ORDER BY answer_id', [cookieId]).then(function(questiondata) {
+    doQuery('SELECT t1.id, t1.question, t2.id AS answer_id, t2.question_id, t2.answer, t2.correct FROM (SELECT id, question FROM TEMP_homepage_questions thq WHERE thq.id NOT IN (SELECT question_id FROM TEMP_homepage_answers tha LEFT JOIN TEMP_homepage_useranswers thu ON thu.answer_id = tha.id AND thu.cookie_id=? WHERE thu.answer_id IS NOT NULL) ORDER BY RAND() LIMIT 1) AS t1 LEFT JOIN TEMP_homepage_answers t2 ON t2.question_id = t1.id ORDER BY displayorder', [cookieId]).then(function(questiondata) {
         var question = {};
         if (questiondata.length !== 0) {
             question.id = questiondata[0].id;
