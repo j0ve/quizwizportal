@@ -28,40 +28,41 @@ html.full(lang='en')
 .container.theme-showcase(role='main')
 
   .jumbotron#admin 
-    table#admintable
-        tr
-            td(colspan='3') vraagtekst:
-                input.admininput#questiontext(type='text', size='80')
-        tr
-            td nr
-            td antwoordtekst
-            td goed
-        tr
-            td 1
-            td(align='left')
-                input.admininput#answertext0(type='text', size="60")
-            td(align='left')
-                input.admininput#correct0(type='checkbox')
-        tr
-            td 2
-            td(align='left')
-                input.admininput#answertext1(type='text', size="60")
-            td(align='left')
-                input.admininput#correct1(type='checkbox')
-        tr
-            td 3
-            td(align='left')
-                input.admininput#answertext2(type='text', size="60")
-            td(align='left')
-                input.admininput#correct2(type='checkbox')
-        tr
-            td 4
-            td(align='left')
-                input.admininput#answertext3(type='text', size="60")
-            td(align='left')
-                input.admininput#correct3(type='checkbox')
-        tr
-            td(colspan='3', align="right") 
+    form
+        .form-group.row 
+            label.col-xs-2.col-form-label(for='questiontext') Vraagtekst
+            input.formcontrol.col-xs-10.admininput#questiontext(type='text')
+        .form-group.row
+            .col-xs-1 nr
+            .col-xs-10 antwoordtekst
+            .col-xs-1 goed
+        .form-group.row
+            label.col-xs-1.col-form-label(for='answertext0') 1
+            .col-xs-9
+                input.col-xs-9.admininput#answertext0(type='text')
+            .col-xs-2
+                input.col-xs-2.admininput#correct0(type='checkbox')
+        .form-group.row
+            label.col-xs-1.col-form-label(for='answertext1') 2
+            .col-xs-9
+                input.col-xs-9.admininput#answertext1(type='text')
+            .col-xs-2
+                input.col-xs-2.admininput#correct1(type='checkbox')
+        .form-group.row
+            label.col-xs-1.col-form-label(for='answertext2') 3
+            .col-xs-9
+                input.col-xs-9.admininput#answertext2(type='text')
+            .col-xs-2
+                input.col-xs-2.admininput#correct2(type='checkbox')
+        .form-group.row
+            label.col-xs-1.col-form-label(for='answertext3') 4
+            .col-xs-9
+                input.col-xs-9.admininput#answertext3(type='text')
+            .col-xs-2
+                input.col-xs-2.admininput#correct3(type='checkbox')                                    
+        .form-group.row
+            .col-xs-10
+            .col-xs-2
                 button.btn.btn-primary#savebtn(type='button') opslaan
 
     // Put your page content here!
