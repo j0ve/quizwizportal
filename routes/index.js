@@ -23,6 +23,18 @@ function getConnectionFromPool() {
     return deferred.promise;
 }
 
+function doAsyncQuery(queryTemplate, parameters) {
+    pool.getConnection(function(err, connection) {
+        var query = mysql.format(queryTemplate, parameters);
+        console.log('Query to execute:' + query);
+        connection.query(query, function(error, result) {
+            if (error) {
+                console.error(error);
+            }
+        });
+    });
+}
+
 function doQuery(queryTemplate, parameters) {
     var deferred = q.defer();
     getConnectionFromPool()
@@ -90,6 +102,9 @@ router.use('/', function(req, res, next) {
     } else {
         // yes, cookie was already present 
     }
+    var ip = req.headers['X-Real-IP'] || req.connection.remoteAddress;
+    doAsyncQuery('REPLACE INTO TEMP_homepage_cookieIPs SET cookie_id=?, IP=?', [req.cookies.quizwizcookieid, ip]);
+
     next(); // <-- important! want hij moet de rest van de pagina nog ladennnnnn
 });
 /* GET home page. */
