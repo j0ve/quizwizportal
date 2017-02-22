@@ -23,15 +23,29 @@ function getConnectionFromPool() {
     return deferred.promise;
 }
 
-function doAsyncQuery(queryTemplate, parameters) {
+
+function doAsyncQuery(queryTemplate, parameters, callback) {
     pool.getConnection(function(err, connection) {
         var query = mysql.format(queryTemplate, parameters);
         console.log('Query to execute:' + query);
         connection.query(query, function(error, result) {
             if (error) {
                 console.error(error);
+            } else {
+                callback(result);
             }
         });
+    });
+}
+// opslaan van de IP/cookie combi, om toch een beetje te kunnen monitoren als t drukker wordt
+function storeCookieIP(cookieId, IP) {
+    // ik gebruik INSERT INGORE, ipv REPLACE, want replace past sowieso een row aan (zij het met 0 wijzigingen), en dan kan ik in t result niet zien of de row al bestond
+    // INSERT IGNORE dropt de statement als de row (of althans de primary key) al bestaat, dus dan is affectedrows = 0
+    doQuery('INSERT IGNORE INTO TEMP_homepage_cookieIPs SET cookie_id=?, IP=?', [cookieId, IP]).then(function(data) {
+        // als affectedrows = 1 dan is het een nieuwe cookie/ip combi, en dan zou je bijv kunnen geolocaten
+        if (data.affectedRows === 1) {
+            // hier dus geolocate lib aanroepen ofzo
+        }
     });
 }
 
@@ -72,7 +86,6 @@ function getHPQuestion(cookieId) {
                 question.answers.push({ "id": questiondata[i].answer_id, "text": questiondata[i].answer, "correct": questiondata[i].correct });
             }
         }
-        console.log(question);
         deferred.resolve(question);
     });
     return deferred.promise;
@@ -102,10 +115,10 @@ router.use('/', function(req, res, next) {
     } else {
         // yes, cookie was already present 
     }
-    //var ip = req.headers['x-forwarded-for'] || req.headers['X-Real-IP'] || req.connection.remoteAddress;
-    var ip = req.headers['x-real-ip'];
-    doAsyncQuery('REPLACE INTO TEMP_homepage_cookieIPs SET cookie_id=?, IP=?', [req.cookies.quizwizcookieid, ip]);
-
+    // get the remote ip
+    var ip = req.headers['x-real-ip'] || 'dev';
+    // store the cookie and ip (asynchronously)
+    storeCookieIP(req.cookies.quizwizcookieid, ip);
     next(); // <-- important! want hij moet de rest van de pagina nog ladennnnnn
 });
 /* GET home page. */
