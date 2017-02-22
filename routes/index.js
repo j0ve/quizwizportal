@@ -102,7 +102,7 @@ router.use('/', function(req, res, next) {
     } else {
         // yes, cookie was already present 
     }
-    var ip = req.headers['X-Real-IP'] || req.connection.remoteAddress;
+    var ip = req.headers['x-forwarded-for'] || req.headers['X-Real-IP'] || req.connection.remoteAddress;
     doAsyncQuery('REPLACE INTO TEMP_homepage_cookieIPs SET cookie_id=?, IP=?', [req.cookies.quizwizcookieid, ip]);
 
     next(); // <-- important! want hij moet de rest van de pagina nog ladennnnnn
